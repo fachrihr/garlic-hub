@@ -91,7 +91,8 @@ $dependencies[PlayerIndexController::class] = DI\factory(function (ContainerInte
 	return new PlayerIndexController(
 		$container->get(PlayerIndexService::class),
 		new IndexResponseHandler(new FileUtils()),
-		$container->get(Sanitizer::class)
+		$container->get(Sanitizer::class),
+		$container->get('ModuleLogger')
 	);
 });
 $dependencies[IndexCreator::class] = DI\factory(function (ContainerInterface $container)

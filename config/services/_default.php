@@ -72,6 +72,7 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Mustache\Engine;
+use Phpfastcache\Drivers\Files\Config as FilesConfig;
 use Phpfastcache\Helper\Psr16Adapter;
 use Psr\Container\ContainerInterface;
 use Slim\App;
@@ -144,7 +145,10 @@ $dependencies[Locales::class] = DI\factory(function (ContainerInterface $contain
 		new SessionLocaleExtractor($container->get(Session::class))
 	);
 });
-$dependencies[Psr16Adapter::class] = DI\factory(function (){return new Psr16Adapter('Files');});
+$dependencies[Psr16Adapter::class] = DI\factory(function (ContainerInterface $container) {
+	$cacheDir = $container->get(Config::class)->getPaths('cacheDir');
+	return new Psr16Adapter('Files', new FilesConfig(['path' => $cacheDir]));
+});
 $dependencies[Translator::class] = DI\factory(function (ContainerInterface $container)
 {
 	$translationDir = $container->get(Config::class)->getPaths('translationDir');

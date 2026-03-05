@@ -41,7 +41,7 @@ COPY ./dockerapp-configs/env.edge /var/www/.env
 
 RUN chown -R www-data:www-data /var/www/
 
-RUN a2enmod rewrite # Enable mod_rewrite
+RUN a2enmod rewrite headers setenvif # Enable required modules
 
 EXPOSE 80
 

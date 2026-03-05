@@ -4,15 +4,12 @@ services:
       context: .
       dockerfile: Dockerfile
     image: garlic-hub
+    environment:
+      - SERVER_NAME=${SERVER_NAME:-localhost}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
       - "8090:80"
     volumes:
-      - garlic-hub-public-var:/var/www/public/var
-      - garlic-hub-var:/var/www/var
-
-# this seems to be required
-volumes:
-  garlic-hub-public-var:
-  garlic-hub-var:
+      - ./data/public:/var/www/public/var
+      - ./data/var:/var/www/var

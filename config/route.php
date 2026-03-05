@@ -29,6 +29,8 @@ use App\Modules\Mediapool\Controller\ShowController;
 use App\Modules\Mediapool\Controller\UploadController;
 use App\Modules\Player\Controller\PlayerController;
 use App\Modules\Player\Controller\PlayerPlaylistController;
+use App\Framework\Core\Config\Config;
+use App\Framework\Middleware\CorsMiddleware;
 use App\Modules\Player\Controller\PlayerIndexController;
 use App\Modules\Player\Controller\ShowConnectivityController;
 use App\Modules\Playlists\Controller\ConditionalPlayController;
@@ -77,7 +79,22 @@ assert($app instanceof App);
 /** @var ContainerInterface $container */
 $container = $app->getContainer();
 
-$app->get('/smil-index', resolve([PlayerIndexController::class, 'index'], $container));
+// Add the domains that are allowed to access /smil-index from a browser JS client.
+// Configure CORS_ALLOWED_ORIGINS in .env as a comma-separated list, e.g. https://example.com,http://localhost
+// Use '*' to allow all origins.
+$corsOriginsEnv = $container->get(Config::class)->getEnv('CORS_ALLOWED_ORIGINS');
+$corsOrigins = !empty($corsOriginsEnv)
+	? array_values(array_filter(array_map('trim', explode(',', $corsOriginsEnv))))
+	: [];
+$corsMiddleware = new CorsMiddleware($corsOrigins);
+
+// Handle CORS preflight requests
+$app->options('/smil-index', function (Request $request, Response $response): Response {
+	return $response; // CORS headers are added by CorsMiddleware
+})->add($corsMiddleware);
+
+$app->get('/smil-index', resolve([PlayerIndexController::class, 'index'], $container))
+	->add($corsMiddleware);
 
 $app->group('', function (RouteCollectorProxy $group) use ($container)
 {

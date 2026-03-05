@@ -9,6 +9,15 @@ localhost {
 
     root * ./public
 
+    # CORS for media files accessed by JS clients
+    # Set CORS_ALLOWED_ORIGINS_REGEX in the environment, e.g.:
+    # CORS_ALLOWED_ORIGINS_REGEX=(https://example\.com|http://localhost:5173)
+    @corsMedia {
+        path /var/mediapool/*
+        header_regexp corsOrigin Origin {$CORS_ALLOWED_ORIGINS_REGEX}
+    }
+    header @corsMedia Access-Control-Allow-Origin {http.regexp.corsOrigin.1}
+
     php_server {
         try_files {path} index.php
     }

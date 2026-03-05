@@ -117,7 +117,7 @@ class Session
 
 	public function exists(string $key): bool
 	{
-		return array_key_exists($key, $_SESSION);
+		return isset($_SESSION) && array_key_exists($key, $_SESSION);
 	}
 
 	public function id(bool $new = false): false|string

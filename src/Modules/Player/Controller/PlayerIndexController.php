@@ -27,6 +27,7 @@ use App\Modules\Player\Helper\Index\IndexResponseHandler;
 use App\Modules\Player\Services\PlayerIndexService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Controller responsible for handling the index functionality for the Player.
@@ -37,12 +38,14 @@ readonly class PlayerIndexController
 	private PlayerIndexService $indexService;
 	private IndexResponseHandler $indexResponseHandler;
 	private Sanitizer $sanitizer;
+	private LoggerInterface $logger;
 
-	public function __construct(PlayerIndexService $indexService, IndexResponseHandler $indexResponseHandler, Sanitizer $sanitizer)
+	public function __construct(PlayerIndexService $indexService, IndexResponseHandler $indexResponseHandler, Sanitizer $sanitizer, LoggerInterface $logger)
 	{
 		$this->indexService         = $indexService;
 		$this->indexResponseHandler = $indexResponseHandler;
 		$this->sanitizer            = $sanitizer;
+		$this->logger               = $logger;
 	}
 
 	/**
@@ -59,7 +62,9 @@ readonly class PlayerIndexController
 		// because JavaScript player cannot send a User-Agent.
 		$userAgent = $server['HTTP_X_SIGNAGE_AGENT'] ?? $server['HTTP_USER_AGENT'];
 
-		$serverName = $server['SERVER_NAME'];
+		// Use X-Forwarded-Host when behind a reverse proxy, fall back to SERVER_NAME
+		$forwardedHost = $server['HTTP_X_FORWARDED_HOST'] ?? $server['HTTP_X_ORIGINAL_HOST'] ?? '';
+		$serverName    = !empty($forwardedHost) ? strtok($forwardedHost, ':') : $server['SERVER_NAME'];
 
 	//	$userAgent = 'GAPI/1.0 (UUID:3f0cd56c-d511-486a-a8e1-9d2cefd78b3f; NAME:9d2cefd78b3f) garlic-macOS/v0.6.0.679 (MODEL:Garlic)';
 		$this->indexService->setUID($ownerId);

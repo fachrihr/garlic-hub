@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Pass Docker environment variables to Apache
+if [[ -n "$SERVER_NAME" ]]; then
+    echo "export SERVER_NAME=${SERVER_NAME}" >> /etc/apache2/envvars
+fi
+
 # create .env secret only when not exists
 
 chown -R www-data:www-data /var/www/public/var /var/www/var
