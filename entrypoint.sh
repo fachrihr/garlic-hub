@@ -5,15 +5,6 @@ if [[ -n "$SERVER_NAME" ]]; then
     echo "export SERVER_NAME=${SERVER_NAME}" >> /etc/apache2/envvars
 fi
 
-# Always export CORS_ALLOWED_ORIGINS_REGEX so Apache config substitution never gets an empty value.
-# Default '^$' matches only empty strings (i.e. no real Origin), effectively disabling CORS
-# when the variable is not configured.
-echo "export CORS_ALLOWED_ORIGINS_REGEX=${CORS_ALLOWED_ORIGINS_REGEX:-^$}" >> /etc/apache2/envvars
-
-if [[ -n "$CORS_ALLOWED_ORIGINS" ]] && ! grep -q '^CORS_ALLOWED_ORIGINS=' /var/www/.env; then
-    echo "CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}" >> /var/www/.env
-fi
-
 # create .env secret only when not exists
 
 chown -R www-data:www-data /var/www/public/var /var/www/var
