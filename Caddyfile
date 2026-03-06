@@ -17,6 +17,7 @@ localhost {
         header_regexp corsOrigin Origin {$CORS_ALLOWED_ORIGINS_REGEX}
     }
     header @corsMedia Access-Control-Allow-Origin {http.regexp.corsOrigin.1}
+    header @corsMedia Vary Origin
 
     php_server {
         try_files {path} index.php
