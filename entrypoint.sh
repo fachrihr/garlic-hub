@@ -5,6 +5,10 @@ if [[ -n "$SERVER_NAME" ]]; then
     echo "export SERVER_NAME=${SERVER_NAME}" >> /etc/apache2/envvars
 fi
 
+if [[ -n "$CORS_ALLOWED_ORIGINS_REGEX" ]]; then
+    echo "export CORS_ALLOWED_ORIGINS_REGEX=${CORS_ALLOWED_ORIGINS_REGEX}" >> /etc/apache2/envvars
+fi
+
 # create .env secret only when not exists
 
 chown -R www-data:www-data /var/www/public/var /var/www/var
